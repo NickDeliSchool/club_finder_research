@@ -20,6 +20,9 @@ string eventKeywords[] = { "tournament", "match", "competition", "game", "event"
 
 
 //Array holding the keywords for detecting clubs (remember to add 'ground')
+
+
+//dkdjfk
 string clubKeywords[] = { "association", "company", "group", "union", "society", "circle", "lodge", "guild", "club", "ground", "centre"};
 
 
