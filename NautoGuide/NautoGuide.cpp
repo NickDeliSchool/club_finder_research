@@ -10,9 +10,11 @@ using namespace std;
 int UnmergedSelection(string line);
 bool EventDetector(string);
 bool FindClubKeyword(string);
-void MergeClubs();
 string ClubNameCollector(string line);
 string* DivisionOfClubName(string line);
+int EventCollector(string line);
+void SeparateClubs();
+int UndefinedData(string line);
 
 // Array holding the keywords for detecting events
 string eventKeywords[] = { "tournament", "match", "competition", "game", "event", "championship", "league", "meetup", "race", "friendly", "practice", "session", "playoff"}; 
@@ -20,10 +22,11 @@ string eventKeywords[] = { "tournament", "match", "competition", "game", "event"
 
 
 //Array holding the keywords for detecting clubs (remember to add 'ground')
-
-
-//dkdjfk
 string clubKeywords[] = { "association", "company", "group", "union", "society", "circle", "lodge", "guild", "club", "ground", "centre"};
+
+//Arrays that hold the high and low confidence club keywords 
+string HighConfidenceClubKeywords[] = { "club", "society" }; 
+string LowConfidenceClubKeywords[] = { "association", "company", "group", "union", "circle", "lodge", "guild", "ground", "centre" };
 
 
 int word_count; // General word count for how many words are in the name of the specified club 
@@ -43,17 +46,39 @@ int main() {
 
 	while (getline(file, line)) {
 
+		EventCollector(line);
+
 		UnmergedSelection(line);
+
+		UndefinedData(line);
 	
 	}
 
 	file.close();
 
-	MergeClubs();
+	SeparateClubs();
 
 	cout << "Process succesfful" << endl;
 
 	return 1;
+}
+
+int EventCollector(string line) { // Function that stores the stuff with club keywords into the "EventsResult"
+
+	if (EventDetector(line)) {
+
+		ofstream EventCollector("EventsResult.csv", ios::app);
+
+		if (!EventCollector.is_open()) {
+
+			cerr << "Error, file couldn't be opened" << endl;
+			return 0;
+		}
+
+		EventCollector << line << endl;
+
+		EventCollector.close();
+	}
 }
 
 int UnmergedSelection(string line) { // Selector that checks if something is an event, then if its a club, and prints it into the unmerged file
@@ -83,8 +108,39 @@ int UnmergedSelection(string line) { // Selector that checks if something is an 
 
 }
 
+int UndefinedData(string line) { // A function that stores the undefined data 
+
+	if ((!EventDetector)&&(!FindClubKeyword)) {
+	
+		ofstream UndefinedData("UndefinedData.csv");
+	
+		UndefinedData << line << endl;
+
+		UndefinedData.close();
+	
+	}
+}
+
+void SeparateClubs() { // Function to seperate clubs based on the keywords within their names and according to the confidence score of the words
+
+	ifstream UnmergedResult("UnmergedResult.csv"); 
+
+	string line;
+
+	string* DividedName3;
+
+	while (getline(UnmergedResult, line)) {
+
+		DividedName3 = DivisionOfClubName(line);
 
 
+		
+
+	}
+
+	UnmergedResult.close();
+
+}
 
 bool EventDetector(string line) { // Detector to check if something is an event or not
 
@@ -123,7 +179,7 @@ bool FindClubKeyword(string line) { // Function that detects keywords indicating
 
 	for (int j = 0; j <= word_count; j++) {
 
-		for (int i = 0; i < 12; i++) {
+		for (int i = 0; i < 11; i++) {
 
 			if (clubKeywords[i].compare(DividedName[j]) == 0) {
 
@@ -137,33 +193,6 @@ bool FindClubKeyword(string line) { // Function that detects keywords indicating
 
 }
 
-void MergeClubs() { // Function that merges the clubs
-
-	ifstream UnmergedResult("UnmergedResult.csv");
-
-	ofstream MergedResult("MergedResult.csv", ios::app);
-
-
-	string line; 
-
-	string* DividedName2;
-
-
-	while (getline(UnmergedResult, line)) {
-
-		DividedName2 = DivisionOfClubName(line); 
-
-	}
-
-
-
-
-
-	UnmergedResult.close();
-
-	MergedResult.close();
-
-}
 
 string* DivisionOfClubName(string line) { // Function that divides the collected name into a string array containing each word
 
